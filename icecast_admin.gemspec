@@ -5,7 +5,7 @@ require "icecast_admin/version"
 Gem::Specification.new do |s|
   s.name        = "icecast_admin"
   s.version     = Icecast::Admin::VERSION
-  s.authors     = ["Nick Wilon"]
+  s.authors     = ["Nick Wilson"]
   s.email       = ["nick@di.fm"]
   s.homepage    = "https://github.com/AudioAddict/icecast_admin"
   s.summary     = %q{Ruby gem for Icecast server administration}
