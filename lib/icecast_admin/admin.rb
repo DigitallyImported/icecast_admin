@@ -1,7 +1,7 @@
 module Icecast
   ResponseError = Class.new(RuntimeError)
   MountNotFoundError = Class.new(ResponseError)
-  
+
   class Admin
     def initialize(ip, port, user, pass)
       @server_ip = ip
@@ -9,9 +9,9 @@ module Icecast
       @admin_user = user
       @admin_pass = pass
     end
-    
+
     def list_mounts(verbose = false)
-      
+
       if verbose
         response = Hash.from_xml(send_request('/admin/listclients'))[:icestats][:source]
         mounts = response.map { |mount|
@@ -20,7 +20,7 @@ module Icecast
         }
       else
         response = Hash.from_xml(send_request('/admin/listmounts'))[:icestats][:source]
-        mounts = response.map { |mount| 
+        mounts = response.map { |mount|
           {
             :name => mount[:attributes][:mount],
             :listeners => mount[:listeners],
@@ -31,7 +31,7 @@ module Icecast
       end
       mounts
     end
-    
+
     def list_clients(mount)
       response = Hash.from_xml(send_request("/admin/listclients?mount=#{mount}"))[:icestats][:source][:listener]
       return [] unless response
@@ -49,7 +49,7 @@ module Icecast
     rescue MountNotFoundError
      []
     end
-    
+
     def find_client_by_ip(mount, ip)
       if mount
         return find_ip_in_mount(mount, ip)
@@ -62,7 +62,7 @@ module Icecast
       end
       nil
     end
-    
+
     def find_ip_in_mount(mount, ip)
       clients = list_clients(mount)
       clients.each do |c|
@@ -70,28 +70,28 @@ module Icecast
       end
       nil
     end
-    
+
     def kick_client(mount, client)
       if client.is_a?(String) && client.include?('.')
         client = find_client_by_ip(mount, client)[:id] rescue nil
       end
-      
+
       response = Hash.from_xml send_request("/admin/killclient?mount=#{mount}&id=#{client}")
       (response[:iceresponse][:return] == 1)
     rescue MountNotFoundError
       false
     end
-    
+
     private
-    
+
     def send_request(path)
       #puts "http://#{@server_ip}:#{@server_port}#{path}"
-      
+
       http = Net::HTTP.new(@server_ip, @server_port)
       req = Net::HTTP::Get.new(path)
       req.basic_auth @admin_user, @admin_pass
       response = http.request(req)
-      
+
       if response.code.to_i != 200
         err = response.body.gsub(/<\/?b>/i, '').strip
         raise case err
@@ -99,9 +99,9 @@ module Icecast
           else ResponseError.new(err)
         end
       end
-      
+
       response.body
     end
-    
+
   end
 end
