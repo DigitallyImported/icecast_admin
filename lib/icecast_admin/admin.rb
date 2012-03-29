@@ -11,7 +11,6 @@ module Icecast
     end
 
     def list_mounts(verbose = false)
-
       if verbose
         response = Hash.from_xml(send_request('/admin/listclients'))[:icestats][:source]
         mounts = response.map { |mount|
@@ -30,6 +29,10 @@ module Icecast
         }
       end
       mounts
+    end
+
+    def get_stats
+      Hash.from_xml(send_request("/admin/stats"))[:icestats]
     end
 
     def list_clients(mount)
@@ -85,8 +88,6 @@ module Icecast
     private
 
     def send_request(path)
-      #puts "http://#{@server_ip}:#{@server_port}#{path}"
-
       http = Net::HTTP.new(@server_ip, @server_port)
       req = Net::HTTP::Get.new(path)
       req.basic_auth @admin_user, @admin_pass
